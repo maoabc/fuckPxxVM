@@ -84,17 +84,17 @@ public class MwBin {
             }
 
             for (ClassData.MethodData method : cls.methods) {
-                if (method.code != null) {
-                    MethodVisitor mv = cw.visitMethod(method.accessFlags, method.name, method.desc, null, null);
+                MethodVisitor mv = cw.visitMethod(method.accessFlags, method.name, method.desc, null, null);
 
-                    for (Map.Entry<String, Map<String, Object>> entry : method.annotations.entrySet()) {
-                        final AnnotationVisitor av = mv.visitAnnotation(entry.getKey(), true);
-                        for (Map.Entry<String, Object> annEntry : entry.getValue().entrySet()) {
-                            visitAnnotation(av, annEntry.getKey(), annEntry.getValue());
-                        }
-                        av.visitEnd();
+                for (Map.Entry<String, Map<String, Object>> entry : method.annotations.entrySet()) {
+                    final AnnotationVisitor av = mv.visitAnnotation(entry.getKey(), true);
+                    for (Map.Entry<String, Object> annEntry : entry.getValue().entrySet()) {
+                        visitAnnotation(av, annEntry.getKey(), annEntry.getValue());
                     }
+                    av.visitEnd();
+                }
 
+                if (method.code != null) {
                     MwCode.parseCode(method.code, constPool, fieldRefTypeSet, mv);
                 }
             }
@@ -226,7 +226,6 @@ public class MwBin {
         }
         return new LinkedHashMap<>();
     }
-
 
 
     public static void toClassesJar(File inFile, File dest) throws IOException {
